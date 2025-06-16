@@ -1,0 +1,25 @@
+# Production environment configuration
+datacenter: "dc1"
+environment: "production"
+rails_env: "production"
+
+# Docker image
+docker_image: "your-registry.com/migration-guard-test-app:latest"
+image_tag: "latest"
+
+# Host configuration
+app_host: "migration-guard-test-app.example.com"
+
+# Instance counts
+web_count: 4
+sidekiq_count: 2
+
+# Resources
+web_cpu: 1024
+web_memory: 2048
+sidekiq_cpu: 512
+sidekiq_memory: 1024
+
+# Update configuration
+update_max_parallel: 2
+canary_count: 2

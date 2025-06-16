@@ -1,0 +1,50 @@
+# PostgreSQL. Versions 9.3 and up are supported.
+#
+# Install the pg driver:
+#   gem install pg
+# On macOS with Homebrew:
+#   gem install pg -- --with-pg-config=/usr/local/bin/pg_config
+# On Windows:
+#   gem install pg
+#       Choose the win32 build.
+#       Install PostgreSQL and put its /bin directory on your path.
+#
+# Configure Using Gemfile
+# gem "pg"
+#
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # https://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+
+development:
+  <<: *default
+  # Use DATABASE_URL if provided (e.g., in Docker), otherwise use defaults
+  url: <%= ENV['DATABASE_URL'] %>
+  database: <%= ENV['DATABASE_URL'] ? nil : 'migration-guard-test-app_development' %>
+test:
+  <<: *default
+  # Use DATABASE_URL if provided (e.g., in Docker), otherwise use defaults
+  url: <%= ENV['DATABASE_URL']&.sub(/development$/, 'test') %>
+  database: <%= ENV['DATABASE_URL'] ? nil : 'migration-guard-test-app_test' %>
+production:
+  primary: &primary_production
+    <<: *default
+    database: migration_guard_test_app_production
+    username: migration_guard_test_app
+    password: <%= ENV["MIGRATION_GUARD_TEST_APP_DATABASE_PASSWORD"] %>
+  cache:
+    <<: *primary_production
+    database: migration_guard_test_app_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: migration_guard_test_app_production_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: migration_guard_test_app_production_cable
+    migrations_paths: db/cable_migrate

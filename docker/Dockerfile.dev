@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+FROM migration-guard-test-app-base:latest
+
+# Install development dependencies
+RUN apt-get update -qq &&     apt-get install -y --no-install-recommends       vim       less       git       postgresql-client &&     rm -rf /var/lib/apt/lists/*
+
+# Set development environment
+ENV RAILS_ENV=development
+ENV BUNDLE_PATH=/bundle
+ENV BUNDLE_BIN=/bundle/bin
+ENV PATH="${BUNDLE_BIN}:${PATH}"
+ENV HISTFILE=/app/tmp/.bash_history
+# Override production bundle settings
+ENV BUNDLE_WITHOUT=""
+ENV BUNDLE_DEPLOYMENT=""
+
+# Create app directory
+WORKDIR /app
+
+# Install development gems
+COPY Gemfile Gemfile.lock ./
+RUN bundle config unset deployment &&     bundle config unset without &&     bundle install --jobs 4 --retry 3
+
+# Add development scripts
+COPY docker/scripts/entrypoint.dev.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]

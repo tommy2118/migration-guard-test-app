@@ -1,0 +1,85 @@
+x-app: &app
+  build:
+    context: .
+    dockerfile: docker/Dockerfile.dev
+    args:
+      RUBY_VERSION: '3.4.1'
+  image: migration-guard-test-app:dev
+  stdin_open: true
+  tty: true
+  volumes:
+    - .:/app:cached
+    - bundle:/bundle
+    - rails_cache:/app/tmp/cache
+    - node_modules:/app/node_modules
+    - history:/usr/local/hist
+  environment: &app_environment
+    RAILS_ENV: development
+    DATABASE_URL: postgresql://postgres:postgres@postgresql:5432/migration-guard-test-app_development
+    REDIS_URL: redis://redis:6379/0
+    ELASTICSEARCH_URL: http://elasticsearch:9200
+    BUNDLE_PATH: /bundle
+    BUNDLE_BIN: /bundle/bin
+    HISTFILE: /usr/local/hist/.bash_history
+    PSQL_HISTFILE: /usr/local/hist/.psql_history
+    EDITOR: vim
+  depends_on:
+    - postgresql
+    - redis
+    - elasticsearch
+
+services:
+  web:
+    <<: *app
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0"
+    ports:
+      - '3000:3000'
+
+  sidekiq:
+    <<: *app
+    command: bundle exec sidekiq
+    depends_on:
+      - redis
+      - postgresql
+
+  postgresql:
+    image: postgres:15-alpine
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - '6379:6379'
+
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - '9200:9200'
+
+volumes:
+  bundle:
+  rails_cache:
+  node_modules:
+  history:
+  postgresql_data:
+  redis_data:
+  elasticsearch_data:
+
+networks:
+  default:
+    name: migration-guard-test-app_default

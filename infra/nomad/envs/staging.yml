@@ -1,0 +1,25 @@
+# Staging environment configuration
+datacenter: "dc1"
+environment: "staging"
+rails_env: "production"  # Use production configs but with staging data
+
+# Docker image
+docker_image: "your-registry.com/migration-guard-test-app:latest"
+image_tag: "latest"
+
+# Host configuration
+app_host: "migration-guard-test-app-staging.example.com"
+
+# Instance counts
+web_count: 2
+sidekiq_count: 1
+
+# Resources
+web_cpu: 512
+web_memory: 1024
+sidekiq_cpu: 256
+sidekiq_memory: 512
+
+# Update configuration
+update_max_parallel: 1
+canary_count: 1

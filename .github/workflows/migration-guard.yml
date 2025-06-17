@@ -1,0 +1,129 @@
+name: Migration Guard Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main, develop]
+  workflow_dispatch:  # Allow manual triggering for testing
+
+jobs:
+  migration-check:
+    name: Check for Orphaned Migrations
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: migration_guard_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for branch comparison
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+
+      - name: Setup database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/migration_guard_test
+          RAILS_ENV: test
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+
+      - name: Run Migration Guard Check
+        id: migration_check
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/migration_guard_test
+          RAILS_ENV: test
+          FORMAT: json
+        run: |
+          echo "Running migration guard check..."
+          bundle exec rails db:migration:ci > migration_check.json || true
+          cat migration_check.json
+          
+          # Parse JSON and set outputs
+          if [ -f migration_check.json ]; then
+            echo "orphaned_count=$(jq -r '.migration_guard.summary.total_orphaned' migration_check.json)" >> $GITHUB_OUTPUT
+            echo "missing_count=$(jq -r '.migration_guard.summary.total_missing' migration_check.json)" >> $GITHUB_OUTPUT
+            echo "exit_code=$(jq -r '.migration_guard.exit_code' migration_check.json)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment PR (if applicable)
+        if: github.event_name == 'pull_request' && steps.migration_check.outputs.orphaned_count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const checkResult = JSON.parse(fs.readFileSync('migration_check.json', 'utf8'));
+            const orphanedCount = checkResult.migration_guard.summary.total_orphaned;
+            const orphanedList = checkResult.migration_guard.orphaned_migrations
+              .map(m => `- \`${m.version}\` (${m.branch})`)
+              .join('\n');
+            
+            const body = `## ⚠️ Migration Guard Alert
+            
+            Found **${orphanedCount}** orphaned migrations that are not in the main branch:
+            
+            ${orphanedList}
+            
+            ### Recommended Actions:
+            1. If these migrations should be included, commit them to your branch
+            2. If they shouldn't be included, run \`rails db:migration:rollback_orphaned\`
+            3. For more details, run \`rails db:migration:status\`
+            
+            ---
+            *This check was performed by [rails-migration-guard](https://github.com/tommy2118/rails-migration-guard)*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Upload migration check results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-check-results
+          path: migration_check.json
+
+      - name: Set job status
+        if: steps.migration_check.outputs.exit_code != '0'
+        run: |
+          echo "Migration guard found issues. Exit code: ${{ steps.migration_check.outputs.exit_code }}"
+          exit ${{ steps.migration_check.outputs.exit_code }}
+
+  # Alternative approach using the composite action (if available)
+  migration-check-composite:
+    name: Check Migrations (Composite Action)
+    runs-on: ubuntu-latest
+    if: false  # Disabled for now since composite action may not exist yet
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - uses: tommy2118/rails-migration-guard@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          strictness: warning
+          format: json

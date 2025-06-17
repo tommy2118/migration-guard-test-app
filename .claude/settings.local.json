@@ -4,7 +4,10 @@
       "Bash(gh issue list:*)",
       "Bash(gh issue view:*)",
       "Bash(docker exec:*)",
-      "Bash(gh issue create:*)"
+      "Bash(gh issue create:*)",
+      "Bash(git remote remove:*)",
+      "Bash(git remote add:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

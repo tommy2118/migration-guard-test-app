@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_17_121536) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_17_212231) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -103,9 +103,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_17_121536) do
     t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "developer1_field"
     t.string "developer2_field"
     t.string "very_long_field_name_for_testing_purposes"
+    t.string "developer1_field"
     t.index ["email"], name: "index_users_on_email"
   end
 

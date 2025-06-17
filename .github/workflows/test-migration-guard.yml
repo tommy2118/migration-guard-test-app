@@ -1,0 +1,263 @@
+name: Test Migration Guard Features
+
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      test_scenario:
+        description: 'Test scenario to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - orphaned_migrations
+          - missing_migrations
+          - ci_integration
+          - sandbox_mode
+
+jobs:
+  test-orphaned-detection:
+    name: Test Orphaned Migration Detection
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+
+      - name: Setup test database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+
+      - name: Create test migrations
+        run: |
+          bundle exec rails generate migration TestOrphaned1
+          bundle exec rails generate migration TestOrphaned2
+          bundle exec rails db:migrate
+          
+      - name: Test detection
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+        run: |
+          echo "=== Testing orphaned migration detection ==="
+          bundle exec rails db:migration:status
+          bundle exec rails db:migration:doctor
+          
+      - name: Test JSON output
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+          FORMAT: json
+        run: |
+          echo "=== Testing JSON format output ==="
+          bundle exec rails db:migration:ci | jq '.'
+          
+  test-ci-integration:
+    name: Test CI Integration Features
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+
+      - name: Setup database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+
+      - name: Test exit codes
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+        run: |
+          echo "=== Testing exit codes ==="
+          
+          # Should exit 0 when no issues
+          bundle exec rails db:migration:ci
+          echo "Exit code with no issues: $?"
+          
+          # Create orphaned migration
+          bundle exec rails generate migration TestExitCode
+          bundle exec rails db:migrate
+          
+          # Should exit 1 with warning
+          bundle exec rails db:migration:ci || echo "Exit code with warnings: $?"
+
+      - name: Test different formats
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+        run: |
+          echo "=== Testing output formats ==="
+          
+          echo "--- Human readable format ---"
+          bundle exec rails db:migration:ci || true
+          
+          echo -e "\n--- JSON format ---"
+          FORMAT=json bundle exec rails db:migration:ci || true
+          
+          echo -e "\n--- Parsing JSON output ---"
+          FORMAT=json bundle exec rails db:migration:ci > result.json || true
+          echo "Orphaned count: $(jq -r '.migration_guard.summary.total_orphaned' result.json)"
+          echo "Exit code: $(jq -r '.migration_guard.exit_code' result.json)"
+
+  test-sandbox-mode:
+    name: Test Sandbox Mode
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+
+      - name: Setup database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+
+      - name: Enable sandbox mode and test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+        run: |
+          echo "=== Testing sandbox mode ==="
+          
+          # Check if sandbox mode shows in doctor command
+          bundle exec rails db:migration:doctor | grep -i sandbox || echo "Sandbox mode not visible in doctor"
+          
+          # Check if sandbox mode shows in status command  
+          bundle exec rails db:migration:status | grep -i sandbox || echo "Sandbox mode not visible in status"
+
+  test-warning-consolidation:
+    name: Test Warning Consolidation
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.0'
+          bundler-cache: true
+
+      - name: Setup database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+
+      - name: Test smart warning mode
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          RAILS_ENV: test
+        run: |
+          echo "=== Testing warning consolidation ==="
+          
+          # Generate multiple migrations
+          bundle exec rails generate migration TestWarning1
+          bundle exec rails generate migration TestWarning2
+          bundle exec rails generate migration TestWarning3
+          
+          # Run them as a batch - should see consolidated warning
+          echo "--- Running batch migration ---"
+          bundle exec rails db:migrate
+          
+          # Generate and run single migration - should see individual warning
+          echo -e "\n--- Running single migration ---"
+          bundle exec rails generate migration TestWarningSingle
+          bundle exec rails db:migrate

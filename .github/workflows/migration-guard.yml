@@ -1,0 +1,56 @@
+name: Migration Guard Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main, develop]
+
+jobs:
+  migration-check:
+    name: Check for Orphaned Migrations
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: migration-guard-test-app_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for branch comparison
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.1
+          bundler-cache: true
+      
+      - name: Setup database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/migration-guard-test-app_test
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+      
+      - name: Migration Guard Check
+        uses: tommy2118/rails-migration-guard/.github/actions/migration-guard@main
+        with:
+          database-url: postgresql://postgres:postgres@localhost:5432/migration-guard-test-app_test
+          strict: true
+          comment-on-pr: true
+          output-format: json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

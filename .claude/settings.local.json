@@ -6,7 +6,10 @@
       "Bash(docker exec:*)",
       "Bash(gh issue create:*)",
       "Bash(git checkout:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(rm:*)",
+      "Bash(ls:*)",
+      "Bash(MIGRATION_GUARD_DEBUG=true git checkout main 2 >& 1)"
     ],
     "deny": []
   }

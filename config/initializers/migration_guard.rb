@@ -26,7 +26,7 @@ MigrationGuard.configure do |config|
   config.cleanup_after_days = 30           # Days before cleanup
 
   # Main branch names to check against (in order of preference)
-  config.main_branch_names = %w[main master trunk]
+  config.main_branch_names = %w[production staging main master trunk]
   
   # Target branches to compare migrations against
   # When set, migrations will be compared against all specified branches

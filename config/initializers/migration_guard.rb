@@ -14,6 +14,10 @@ MigrationGuard.configure do |config|
   config.track_branch = true
   config.track_author = true
   config.track_timestamp = true
+  
+  # Team collaboration settings
+  config.warn_after_migration = true      # Alert team members about orphaned migrations
+  config.block_deploy_with_orphans = true # Prevent deployments with orphaned migrations
 
   # Behavior options
   config.sandbox_mode = false              # Run migrations in sandbox mode

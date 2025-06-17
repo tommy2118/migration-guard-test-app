@@ -1,0 +1,116 @@
+{
+  "migration_guard": {
+    "version": "0.1.0",
+    "status": "warning",
+    "summary": {
+      "total_orphaned": 0,
+      "total_missing": 13,
+      "issues_found": 13,
+      "main_branch": "main",
+      "current_branch": "HEAD"
+    },
+    "orphaned_migrations": [],
+    "missing_migrations": [
+      {
+        "version": "20250617000634",
+        "file": "20250617000634_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617045645",
+        "file": "20250617045645_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617045710",
+        "file": "20250617045710_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617045827",
+        "file": "20250617045827_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617045958",
+        "file": "20250617045958_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617050016",
+        "file": "20250617050016_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617121536",
+        "file": "20250617121536_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617212028",
+        "file": "20250617212028_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617212029",
+        "file": "20250617212029_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617212030",
+        "file": "20250617212030_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617212104",
+        "file": "20250617212104_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617212230",
+        "file": "20250617212230_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      },
+      {
+        "version": "20250617212231",
+        "file": "20250617212231_*.rb",
+        "branch": "main",
+        "author": "unknown",
+        "created_at": null
+      }
+    ],
+    "branch_info": {
+      "current": "HEAD",
+      "main": "main",
+      "ahead_count": 0,
+      "behind_count": 0
+    },
+    "timestamp": "2025-06-17T16:45:42-05:00",
+    "exit_code": 1,
+    "strictness": "warning"
+  }
+}

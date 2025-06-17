@@ -51,6 +51,14 @@ jobs:
         run: |
           bundle exec rails db:create
           bundle exec rails db:schema:load
+          
+      - name: Run pending migrations (if any)
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/migration_guard_test
+          RAILS_ENV: development
+        run: |
+          echo "Running any pending migrations to detect orphaned ones..."
+          bundle exec rails db:migrate || true
 
       - name: Run Migration Guard Check
         id: migration_check

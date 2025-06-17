@@ -3,6 +3,10 @@
 This README would normally document whatever steps are necessary to get the
 application up and running.
 
+## Testing Rails Migration Guard
+
+This app is used to test the rails-migration-guard gem with GitHub Actions integration.
+
 Things you may want to cover:
 
 * Ruby version

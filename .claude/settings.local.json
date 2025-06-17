@@ -4,7 +4,10 @@
       "Bash(gh issue list:*)",
       "Bash(gh issue view:*)",
       "Bash(docker exec:*)",
-      "Bash(gh issue create:*)"
+      "Bash(gh issue create:*)",
+      "Bash(bundle install:*)",
+      "Bash(bundle info:*)",
+      "Bash(MIGRATION_GUARD_OUTPUT=json docker exec -e MIGRATION_GUARD_OUTPUT=json migration-guard-test-app-web-1 rails db:migration:ci)"
     ],
     "deny": []
   }

@@ -1,3 +1,13 @@
+GIT
+  remote: https://github.com/tommy2118/rails-migration-guard.git
+  revision: cef9f70afc0873d221fd7ccd1b2bd0670ad1916a
+  specs:
+    rails_migration_guard (0.1.0)
+      activerecord (>= 6.1, < 9.0)
+      activesupport (>= 6.1, < 9.0)
+      rails (>= 6.1, < 9.0)
+      rainbow (~> 3.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -509,6 +519,7 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.2)
+  rails_migration_guard!
   redis
   rspec-rails
   rubocop

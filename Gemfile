@@ -57,6 +57,9 @@ group :development, :test do
   gem 'simplecov', require: false
   gem 'webmock'
   gem 'vcr'
+  
+  # Rails Migration Guard - prevent orphaned migrations
+  gem 'rails_migration_guard', github: 'tommy2118/rails-migration-guard'
 end
 
 group :development do

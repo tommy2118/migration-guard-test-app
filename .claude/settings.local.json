@@ -6,7 +6,8 @@
       "Bash(docker exec:*)",
       "Bash(gh issue create:*)",
       "Bash(git checkout:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(/dev/null)"
     ],
     "deny": []
   }

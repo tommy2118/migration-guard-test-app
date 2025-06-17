@@ -18,11 +18,11 @@ MigrationGuard.configure do |config|
   # Behavior options
   config.sandbox_mode = false              # Run migrations in sandbox mode
   config.warn_on_switch = true             # Warn when switching branches
-  config.warn_after_migration = true      # Warn about orphaned migrations after running migrations
-  config.block_deploy_with_orphans = false # Block deploys with orphaned migrations
+  config.warn_after_migration = false     # Warn about orphaned migrations after running migrations
+  config.block_deploy_with_orphans = true  # Block deploys with orphaned migrations
 
   # Cleanup policies
-  config.auto_cleanup = false              # Automatically clean up old records
+  config.auto_cleanup = true               # Automatically clean up old records
   config.cleanup_after_days = 30           # Days before cleanup
 
   # Main branch names to check against (in order of preference)
@@ -35,9 +35,9 @@ MigrationGuard.configure do |config|
   config.target_branches = %w[main develop staging]
   
   # Logging configuration
-  # config.log_level = :info  # :debug, :info, :warn, :error, :fatal
-  # config.logger = Rails.logger  # or Logger.new('log/migration_guard.log')
-  # config.visible_debug = true   # Show debug output in console/STDOUT
+  config.log_level = :info  # :debug, :info, :warn, :error, :fatal
+  config.logger = Rails.logger  # or Logger.new('log/migration_guard.log')
+  config.visible_debug = false   # Show debug output in console/STDOUT
   
   # Enable debug logging via environment variables
   # ENV['MIGRATION_GUARD_DEBUG'] = 'true'     # Enables debug level + visible output

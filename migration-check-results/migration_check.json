@@ -1,0 +1,7 @@
+{
+  "migration_guard": {
+    "status": "disabled",
+    "message": "MigrationGuard is not enabled in test environment",
+    "exit_code": 0
+  }
+}

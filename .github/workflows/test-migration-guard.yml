@@ -43,6 +43,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
+      - name: Setup git branches
+        run: |
+          git fetch origin main:main || true
+          git branch --list
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -53,7 +58,7 @@ jobs:
       - name: Setup test database
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           bundle exec rails db:create
           bundle exec rails db:schema:load
@@ -67,7 +72,7 @@ jobs:
       - name: Test detection
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           echo "=== Testing orphaned migration detection ==="
           bundle exec rails db:migration:status
@@ -76,7 +81,7 @@ jobs:
       - name: Test JSON output
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
           FORMAT: json
         run: |
           echo "=== Testing JSON format output ==="
@@ -105,6 +110,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          
+      - name: Setup git branches
+        run: |
+          git fetch origin main:main || true
+          git branch --list
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -115,7 +125,7 @@ jobs:
       - name: Setup database
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           bundle exec rails db:create
           bundle exec rails db:schema:load
@@ -123,7 +133,7 @@ jobs:
       - name: Test exit codes
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           echo "=== Testing exit codes ==="
           
@@ -141,7 +151,7 @@ jobs:
       - name: Test different formats
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           echo "=== Testing output formats ==="
           
@@ -187,7 +197,7 @@ jobs:
       - name: Setup database
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           bundle exec rails db:create
           bundle exec rails db:schema:load
@@ -195,7 +205,7 @@ jobs:
       - name: Enable sandbox mode and test
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           echo "=== Testing sandbox mode ==="
           
@@ -236,7 +246,7 @@ jobs:
       - name: Setup database
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           bundle exec rails db:create
           bundle exec rails db:schema:load
@@ -244,7 +254,7 @@ jobs:
       - name: Test smart warning mode
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           echo "=== Testing warning consolidation ==="
           

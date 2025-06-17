@@ -32,6 +32,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Full history for branch comparison
+          
+      - name: Setup git branches
+        run: |
+          git fetch origin main:main || true
+          git branch --list
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -42,16 +47,17 @@ jobs:
       - name: Setup database
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/migration_guard_test
-          RAILS_ENV: test
+          RAILS_ENV: development
         run: |
           bundle exec rails db:create
           bundle exec rails db:schema:load
+          bundle exec rails db:migrate
 
       - name: Run Migration Guard Check
         id: migration_check
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/migration_guard_test
-          RAILS_ENV: test
+          RAILS_ENV: development
           FORMAT: json
         run: |
           echo "Running migration guard check..."

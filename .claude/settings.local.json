@@ -4,7 +4,8 @@
       "Bash(gh issue list:*)",
       "Bash(gh issue view:*)",
       "Bash(docker exec:*)",
-      "Bash(gh issue create:*)"
+      "Bash(gh issue create:*)",
+      "WebFetch(domain:tommy2118.github.io)"
     ],
     "deny": []
   }

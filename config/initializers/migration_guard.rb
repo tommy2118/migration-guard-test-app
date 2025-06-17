@@ -8,7 +8,7 @@ MigrationGuard.configure do |config|
   # - :off - No git integration
   # - :warning - Warn about orphaned migrations
   # - :auto_rollback - Automatically suggest rollback
-  config.git_integration_level = :warning
+  config.git_integration_level = :auto_rollback
 
   # What information to track for each migration
   config.track_branch = true

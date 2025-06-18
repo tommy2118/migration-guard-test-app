@@ -7,6 +7,10 @@ on:
     branches: [main, develop]
   workflow_dispatch:  # Allow manual triggering for testing
 
+permissions:
+  contents: read
+  pull-requests: write  # Required for commenting on PRs
+
 jobs:
   migration-check:
     name: Check for Orphaned Migrations

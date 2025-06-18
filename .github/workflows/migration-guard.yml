@@ -10,6 +10,7 @@ on:
 permissions:
   contents: read
   pull-requests: write  # Required for commenting on PRs
+  issues: write  # Also needed for PR comments via GitHub API
 
 jobs:
   migration-check:

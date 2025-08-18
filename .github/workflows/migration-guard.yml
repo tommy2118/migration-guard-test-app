@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Full history for branch comparison
 
@@ -118,7 +118,7 @@ jobs:
     if: false  # Disabled for now since composite action may not exist yet
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           

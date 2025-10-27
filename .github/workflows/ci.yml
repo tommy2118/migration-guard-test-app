@@ -94,7 +94,7 @@ jobs:
           file: ./coverage/.resultset.json
       
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: test-results

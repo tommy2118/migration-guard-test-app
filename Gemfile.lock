@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/tommy2118/rails-migration-guard.git
-  revision: 6fd029f48a3b3cc8ca237401cf74362e71f7f196
+  revision: 79f18a8849af90f31df1c5fc61fedfc7ff0b7f6d
   specs:
     rails_migration_guard (0.1.0)
       activerecord (>= 6.1, < 9.0)

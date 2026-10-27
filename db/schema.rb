@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_17_212231) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_18_020646) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,6 +80,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_17_212231) do
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
+  create_table "orphaned_features", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "posts", force: :cascade do |t|
     t.string "title"
     t.text "content"
@@ -106,6 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_17_212231) do
     t.string "developer2_field"
     t.string "very_long_field_name_for_testing_purposes"
     t.string "developer1_field"
+    t.string "test_field"
     t.index ["email"], name: "index_users_on_email"
   end
 

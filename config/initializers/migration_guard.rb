@@ -26,7 +26,7 @@ MigrationGuard.configure do |config|
   # - :once    - Show warnings only once at the end of all migrations
   # - :smart   - Show warnings individually for single migrations, summary for batches (default)
   # - :summary - Always show summary format, even for single migrations
-  config.warning_frequency = :smart
+  # config.warning_frequency = :smart
 
   # Cleanup policies
   config.auto_cleanup = false              # Automatically clean up old records
